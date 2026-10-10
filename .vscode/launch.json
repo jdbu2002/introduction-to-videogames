@@ -12,7 +12,17 @@
       "program": "${workspaceFolder}/class-1/main.py",
       "console": "integratedTerminal",
       "python": "${workspaceFolder}/.venv/bin/python",
-      "justMyCode": true,
+      "justMyCode": true
+    },
+    {
+      "name": "Exercise 1",
+      "type": "debugpy",
+      "request": "launch",
+      "pythonArgs": ["-B"],
+      "program": "${workspaceFolder}/exercise-1/main.py",
+      "console": "integratedTerminal",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "justMyCode": true
     }
   ]
 }
