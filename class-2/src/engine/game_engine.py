@@ -5,26 +5,37 @@ import pygame
 from esper import World
 from pygame import Color
 
-from src.ecs.components.c_enemy_spawner import CEnemySpawner
-from src.ecs.systems.s_enemy_spawner import system_enemy_spawner
-from src.ecs.systems.s_movement import system_movement
-from src.ecs.systems.s_rendering import system_rendering
-from src.ecs.systems.s_screen_bounce import system_screen_bounce
-from src.types.enemy import Enemy
-from src.types.level import Level
-from src.types.window import Window
-
-file_path = path.dirname(path.abspath(__file__))
-config_folder = path.join(file_path, "../../assets/cfg")
+from src.create.prefabs import create_enemy_spawner, create_player_square
+from src.ecs.systems import (
+    system_enemy_spawner,
+    system_movement,
+    system_rendering,
+    system_screen_bounce,
+)
+from src.types import Config, Enemy, Level, Player, Window
 
 
 class GameEngine:
     def __init__(self) -> None:
         pygame.init()
 
-        self.is_running = False
+        self.config: Config
+        self._load_config_files()
 
-        self._load_screen_config()
+        pygame.display.set_caption(self.config["window"]["title"])
+
+        self.screen = pygame.display.set_mode(
+            (self.config["window"]["size"]["w"], self.config["window"]["size"]["h"])
+        )
+        self.bg_color = Color(
+            self.config["window"]["bg_color"]["r"],
+            self.config["window"]["bg_color"]["g"],
+            self.config["window"]["bg_color"]["b"],
+        )
+
+        self.framerate = self.config["window"]["framerate"]
+
+        self.is_running = False
 
         self.clock = pygame.time.Clock()
         self.delta_time: float = 0
@@ -42,15 +53,10 @@ class GameEngine:
         self._clean()
 
     def _create(self):
-        spawner = self.world.create_entity()
-
-        with open(path.join(config_folder, "enemies.json")) as f:
-            enemies: dict[str, Enemy] = json.load(f)
-
-        with open(path.join(config_folder, "level_01.json")) as f:
-            level: Level = json.load(f)
-
-        self.world.add_component(spawner, CEnemySpawner(enemies, level))
+        create_player_square(
+            self.world, self.config["player"], self.config["level"]["player_spawn"]
+        )
+        create_enemy_spawner(self.world, self.config["enemies"], self.config["level"])
 
     def _calculate_time(self):
         self.clock.tick(self.framerate)
@@ -76,16 +82,25 @@ class GameEngine:
     def _clean(self):
         pygame.quit()
 
-    def _load_screen_config(self):
+    def _load_config_files(self):
+        file_path = path.dirname(path.abspath(__file__))
+        config_folder = path.join(file_path, "../../assets/cfg")
+
         with open(path.join(config_folder, "window.json")) as f:
-            config: Window = json.load(f)
+            window: Window = json.load(f)
 
-        pygame.display.set_caption(config["title"])
+        with open(path.join(config_folder, "enemies.json")) as f:
+            enemies: dict[str, Enemy] = json.load(f)
 
-        size = (config["size"]["w"], config["size"]["h"])
-        self.screen = pygame.display.set_mode(size)
-        self.bg_color = Color(
-            config["bg_color"]["r"], config["bg_color"]["g"], config["bg_color"]["b"]
-        )
+        with open(path.join(config_folder, "level_01.json")) as f:
+            level: Level = json.load(f)
 
-        self.framerate = config["framerate"]
+        with open(path.join(config_folder, "player.json")) as f:
+            player: Player = json.load(f)
+
+        self.config = {
+            "window": window,
+            "enemies": enemies,
+            "level": level,
+            "player": player,
+        }

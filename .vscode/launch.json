@@ -23,6 +23,16 @@
       "console": "integratedTerminal",
       "python": "${workspaceFolder}/.venv/bin/python",
       "justMyCode": true
+    },
+    {
+      "name": "Class 2",
+      "type": "debugpy",
+      "request": "launch",
+      "pythonArgs": ["-B"],
+      "program": "${workspaceFolder}/class-2/main.py",
+      "console": "integratedTerminal",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "justMyCode": true
     }
   ]
 }
