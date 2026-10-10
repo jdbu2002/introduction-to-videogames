@@ -25,7 +25,7 @@ def system_enemy_spawner(world: World, total_time: float):
 
             size = Vector2(type["size"]["x"], type["size"]["y"])
 
-            random_angle = random.uniform(0, 360)
+            random_angle = math.radians(random.uniform(0, 360))
             random_speed = random.uniform(type["velocity_min"], type["velocity_max"])
 
             vel = Vector2(

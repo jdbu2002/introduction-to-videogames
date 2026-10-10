@@ -1,67 +1,99 @@
 {
     "enemy_spawn_events": [
         {
-            "time": 3.0,
-            "enemy_type": "TypeA",
+            "time": 0.1,
+            "enemy_type": "SA",
             "position": {
-                "x": 50,
-                "y": 50
+                "x": 5,
+                "y": 5
             }
         },
         {
-            "time": 6.0,
-            "enemy_type": "TypeB",
+            "time": 0.1,
+            "enemy_type": "SA",
             "position": {
-                "x": 500,
-                "y": 200
+                "x": 10,
+                "y": 10
             }
         },
         {
-            "time": 9.0,
-            "enemy_type": "TypeC",
+            "time": 0.1,
+            "enemy_type": "SA",
             "position": {
-                "x": 200,
-                "y": 300
+                "x": 15,
+                "y": 15
             }
         },
         {
-            "time": 12.0,
-            "enemy_type": "TypeD",
+            "time": 0.1,
+            "enemy_type": "SA",
             "position": {
-                "x": 600,
-                "y": 50
+                "x": 20,
+                "y": 20
             }
         },
         {
-            "time": 14.0,
-            "enemy_type": "TypeA",
+            "time": 0.1,
+            "enemy_type": "SA",
             "position": {
-                "x": 90,
-                "y": 180
+                "x": 30,
+                "y": 30
             }
         },
         {
-            "time": 16.0,
-            "enemy_type": "TypeB",
+            "time": 0.1,
+            "enemy_type": "SA",
             "position": {
-                "x": 200,
-                "y": 200
+                "x": 40,
+                "y": 40
             }
         },
         {
-            "time": 18.0,
-            "enemy_type": "TypeC",
+            "time": 1,
+            "enemy_type": "SB",
             "position": {
-                "x": 240,
-                "y": 90
+                "x": 45,
+                "y": 5
             }
         },
         {
-            "time": 20.0,
-            "enemy_type": "TypeD",
+            "time": 1,
+            "enemy_type": "SB",
             "position": {
-                "x": 540,
-                "y": 260
+                "x": 40,
+                "y": 10
+            }
+        },
+        {
+            "time": 1,
+            "enemy_type": "SB",
+            "position": {
+                "x": 35,
+                "y": 15
+            }
+        },
+        {
+            "time": 1,
+            "enemy_type": "SB",
+            "position": {
+                "x": 30,
+                "y": 20
+            }
+        },
+        {
+            "time": 1,
+            "enemy_type": "SB",
+            "position": {
+                "x": 25,
+                "y": 15
+            }
+        },
+        {
+            "time": 1,
+            "enemy_type": "SB",
+            "position": {
+                "x": 20,
+                "y": 10
             }
         }
     ]
