@@ -5,6 +5,7 @@ from esper import World
 from pygame import Color, Vector2
 
 from src.ecs.components import CEnemySpawner, CSurface, CTransform, CVelocity
+from src.ecs.components.tags import CTagEnemy, CTagPlayer
 from src.types import Enemy, Level, Player, PlayerSpawn, Position
 
 
@@ -21,6 +22,8 @@ def create_square(
 
     for component in components:
         world.add_component(entity, component)
+
+    return entity
 
 
 def create_enemy_spawner(world: World, enemy_cfg: dict[str, Enemy], level_cgf: Level):
@@ -42,7 +45,10 @@ def create_enemy_square(world: World, type: Enemy, position: Position):
         random_speed * math.sin(random_angle),
     )
 
-    create_square(world, size, pos, vel, color)
+    entity = create_square(world, size, pos, vel, color)
+    world.add_component(entity, CTagEnemy)
+
+    return entity
 
 
 def create_player_square(world: World, cfg: Player, player_spawn: PlayerSpawn):
@@ -55,4 +61,7 @@ def create_player_square(world: World, cfg: Player, player_spawn: PlayerSpawn):
     color = Color(cfg["color"]["r"], cfg["color"]["g"], cfg["color"]["b"])
     vel = Vector2(0, 0)
 
-    create_square(world, size, pos, vel, color)
+    entity = create_square(world, size, pos, vel, color)
+    world.add_component(entity, CTagPlayer)
+
+    return entity

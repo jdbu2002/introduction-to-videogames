@@ -6,6 +6,7 @@ from esper import World
 from pygame import Color
 
 from src.create.prefabs import create_enemy_spawner, create_player_square
+from src.ecs.components import CVelocity
 from src.ecs.systems import (
     system_enemy_spawner,
     system_movement,
@@ -53,9 +54,13 @@ class GameEngine:
         self._clean()
 
     def _create(self):
-        create_player_square(
+        self._player_entity = create_player_square(
             self.world, self.config["player"], self.config["level"]["player_spawn"]
         )
+        self._player_c_v = self.world.component_for_entity(
+            self._player_entity, CVelocity
+        )
+
         create_enemy_spawner(self.world, self.config["enemies"], self.config["level"])
 
     def _calculate_time(self):
