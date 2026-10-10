@@ -1,10 +1,17 @@
 import math
 import random
 
+import pygame
 from esper import World
 from pygame import Color, Vector2
 
-from src.ecs.components import CEnemySpawner, CSurface, CTransform, CVelocity
+from src.ecs.components import (
+    CEnemySpawner,
+    CInputCommand,
+    CSurface,
+    CTransform,
+    CVelocity,
+)
 from src.ecs.components.tags import CTagEnemy, CTagPlayer
 from src.types import Enemy, Level, Player, PlayerSpawn, Position
 
@@ -12,24 +19,11 @@ from src.types import Enemy, Level, Player, PlayerSpawn, Position
 def create_square(
     world: World, size: Vector2, pos: Vector2, vel: Vector2, color: Color
 ):
-    entity = world.create_entity()
-
-    components: list[CSurface | CVelocity | CTransform] = [
-        CTransform(pos),
-        CVelocity(vel),
-        CSurface(size, color),
-    ]
-
-    for component in components:
-        world.add_component(entity, component)
-
-    return entity
+    return world.create_entity(CTransform(pos), CVelocity(vel), CSurface(size, color))
 
 
 def create_enemy_spawner(world: World, enemy_cfg: dict[str, Enemy], level_cgf: Level):
-    spawner = world.create_entity()
-
-    world.add_component(spawner, CEnemySpawner(enemy_cfg, level_cgf))
+    return world.create_entity(CEnemySpawner(enemy_cfg, level_cgf))
 
 
 def create_enemy_square(world: World, type: Enemy, position: Position):
@@ -46,7 +40,7 @@ def create_enemy_square(world: World, type: Enemy, position: Position):
     )
 
     entity = create_square(world, size, pos, vel, color)
-    world.add_component(entity, CTagEnemy)
+    world.add_component(entity, CTagEnemy())
 
     return entity
 
@@ -62,6 +56,18 @@ def create_player_square(world: World, cfg: Player, player_spawn: PlayerSpawn):
     vel = Vector2(0, 0)
 
     entity = create_square(world, size, pos, vel, color)
-    world.add_component(entity, CTagPlayer)
+    world.add_component(entity, CTagPlayer())
 
     return entity
+
+
+def create_player_input(world: World):
+    inputs = [
+        ("PLAYER_UP", pygame.K_UP),
+        ("PLAYER_RIGHT", pygame.K_RIGHT),
+        ("PLAYER_DOWN", pygame.K_DOWN),
+        ("PLAYER_LEFT", pygame.K_LEFT),
+    ]
+
+    for input in inputs:
+        world.create_entity(CInputCommand(*input))

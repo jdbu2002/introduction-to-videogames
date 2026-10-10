@@ -5,11 +5,16 @@ import pygame
 from esper import World
 from pygame import Color
 
-from src.create.prefabs import create_enemy_spawner, create_player_square
-from src.ecs.components import CVelocity
+from src.create.prefabs import (
+    create_enemy_spawner,
+    create_player_input,
+    create_player_square,
+)
+from src.ecs.components import CInputCommand, CVelocity
 from src.ecs.systems import (
     system_enemy_spawner,
     system_movement,
+    system_player_input,
     system_rendering,
     system_screen_bounce,
 )
@@ -63,12 +68,16 @@ class GameEngine:
 
         create_enemy_spawner(self.world, self.config["enemies"], self.config["level"])
 
+        create_player_input(self.world)
+
     def _calculate_time(self):
         self.clock.tick(self.framerate)
         self.delta_time = self.clock.get_time() / 1000
 
     def _process_events(self):
         for event in pygame.event.get():
+            system_player_input(self.world, event, self._do_action)
+
             if event.type == pygame.QUIT:
                 self.is_running = False
 
@@ -109,3 +118,30 @@ class GameEngine:
             "level": level,
             "player": player,
         }
+
+    def _do_action(self, c_input: CInputCommand):
+        print(c_input.name, c_input.phase)
+
+        match c_input.name:
+            case "PLAYER_LEFT":
+                self._player_c_v.vel.x -= (
+                    self.config["player"]["input_velocity"] * c_input.phase.value
+                )
+
+            case "PLAYER_RIGHT":
+                self._player_c_v.vel.x += (
+                    self.config["player"]["input_velocity"] * c_input.phase.value
+                )
+
+            case "PLAYER_UP":
+                self._player_c_v.vel.y -= (
+                    self.config["player"]["input_velocity"] * c_input.phase.value
+                )
+
+            case "PLAYER_DOWN":
+                self._player_c_v.vel.y += (
+                    self.config["player"]["input_velocity"] * c_input.phase.value
+                )
+
+            case _:
+                pass
