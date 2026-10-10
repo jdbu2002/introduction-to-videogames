@@ -27,7 +27,6 @@ class GameEngine:
         self._load_screen_config()
 
         self.clock = pygame.time.Clock()
-        self.total_time: float = 0
         self.delta_time: float = 0
 
         self.world = World()
@@ -56,7 +55,6 @@ class GameEngine:
     def _calculate_time(self):
         self.clock.tick(self.framerate)
         self.delta_time = self.clock.get_time() / 1000
-        self.total_time += self.delta_time
 
     def _process_events(self):
         for event in pygame.event.get():
@@ -64,7 +62,7 @@ class GameEngine:
                 self.is_running = False
 
     def _update(self):
-        system_enemy_spawner(self.world, self.total_time)
+        system_enemy_spawner(self.world, self.delta_time)
         system_movement(self.world, self.delta_time)
         system_screen_bounce(self.world, self.screen)
 
