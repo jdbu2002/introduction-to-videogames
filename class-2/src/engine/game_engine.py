@@ -12,6 +12,7 @@ from src.create.prefabs import (
 )
 from src.ecs.components import CInputCommand, CVelocity
 from src.ecs.systems import (
+    system_collission_player_enemy,
     system_enemy_spawner,
     system_movement,
     system_player_input,
@@ -85,6 +86,11 @@ class GameEngine:
         system_enemy_spawner(self.world, self.delta_time)
         system_movement(self.world, self.delta_time)
         system_screen_bounce(self.world, self.screen)
+        system_collission_player_enemy(
+            self.world, self._player_entity, self.config["level"]["player_spawn"]
+        )
+
+        self.world._clear_dead_entities()  # type: ignore
 
     def _draw(self):
         self.screen.fill(self.bg_color)
@@ -94,6 +100,7 @@ class GameEngine:
         pygame.display.flip()
 
     def _clean(self):
+        self.world.clear_database()
         pygame.quit()
 
     def _load_config_files(self):
