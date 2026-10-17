@@ -1,0 +1,154 @@
+import json
+from os import path
+
+import pygame
+from esper import World
+from pygame import Color
+
+from src.create.prefabs import (
+    create_enemy_spawner,
+    create_player_input,
+    create_player_square,
+)
+from src.ecs.components import CInputCommand, CVelocity
+from src.ecs.systems import (
+    system_collission_player_enemy,
+    system_enemy_spawner,
+    system_movement,
+    system_player_input,
+    system_rendering,
+    system_screen_bounce,
+)
+from src.types import Config, Enemy, Level, Player, Window
+
+
+class GameEngine:
+    def __init__(self) -> None:
+        pygame.init()
+
+        self.config: Config
+        self._load_config_files()
+
+        pygame.display.set_caption(self.config["window"]["title"])
+
+        self.screen = pygame.display.set_mode(
+            (self.config["window"]["size"]["w"], self.config["window"]["size"]["h"])
+        )
+        self.bg_color = Color(
+            self.config["window"]["bg_color"]["r"],
+            self.config["window"]["bg_color"]["g"],
+            self.config["window"]["bg_color"]["b"],
+        )
+
+        self.framerate = self.config["window"]["framerate"]
+
+        self.is_running = False
+
+        self.clock = pygame.time.Clock()
+        self.delta_time: float = 0
+
+        self.world = World()
+
+    def run(self) -> None:
+        self._create()
+        self.is_running = True
+        while self.is_running:
+            self._calculate_time()
+            self._process_events()
+            self._update()
+            self._draw()
+        self._clean()
+
+    def _create(self):
+        self._player_entity = create_player_square(
+            self.world, self.config["player"], self.config["level"]["player_spawn"]
+        )
+        self._player_c_v = self.world.component_for_entity(
+            self._player_entity, CVelocity
+        )
+
+        create_enemy_spawner(self.world, self.config["enemies"], self.config["level"])
+
+        create_player_input(self.world)
+
+    def _calculate_time(self):
+        self.clock.tick(self.framerate)
+        self.delta_time = self.clock.get_time() / 1000
+
+    def _process_events(self):
+        for event in pygame.event.get():
+            system_player_input(self.world, event, self._do_action)
+
+            if event.type == pygame.QUIT:
+                self.is_running = False
+
+    def _update(self):
+        system_enemy_spawner(self.world, self.delta_time)
+        system_movement(self.world, self.delta_time)
+        system_screen_bounce(self.world, self.screen)
+        system_collission_player_enemy(
+            self.world, self._player_entity, self.config["level"]["player_spawn"]
+        )
+
+        self.world._clear_dead_entities()  # type: ignore
+
+    def _draw(self):
+        self.screen.fill(self.bg_color)
+
+        system_rendering(self.world, self.screen)
+
+        pygame.display.flip()
+
+    def _clean(self):
+        self.world.clear_database()
+        pygame.quit()
+
+    def _load_config_files(self):
+        file_path = path.dirname(path.abspath(__file__))
+        config_folder = path.join(file_path, "../../assets/cfg")
+
+        with open(path.join(config_folder, "window.json")) as f:
+            window: Window = json.load(f)
+
+        with open(path.join(config_folder, "enemies.json")) as f:
+            enemies: dict[str, Enemy] = json.load(f)
+
+        with open(path.join(config_folder, "level_01.json")) as f:
+            level: Level = json.load(f)
+
+        with open(path.join(config_folder, "player.json")) as f:
+            player: Player = json.load(f)
+
+        self.config = {
+            "window": window,
+            "enemies": enemies,
+            "level": level,
+            "player": player,
+        }
+
+    def _do_action(self, c_input: CInputCommand):
+        print(c_input.name, c_input.phase)
+
+        match c_input.name:
+            case "PLAYER_LEFT":
+                self._player_c_v.vel.x -= (
+                    self.config["player"]["input_velocity"] * c_input.phase.value
+                )
+
+            case "PLAYER_RIGHT":
+                self._player_c_v.vel.x += (
+                    self.config["player"]["input_velocity"] * c_input.phase.value
+                )
+
+            case "PLAYER_UP":
+                self._player_c_v.vel.y -= (
+                    self.config["player"]["input_velocity"] * c_input.phase.value
+                )
+
+            case "PLAYER_DOWN":
+                self._player_c_v.vel.y += (
+                    self.config["player"]["input_velocity"] * c_input.phase.value
+                )
+
+            case _:
+                pass
