@@ -11,6 +11,7 @@ class EnemySpawnEvent(TypedDict):
 
 class PlayerSpawn(TypedDict):
     position: Position
+    max_bullets: int
 
 
 class Level(TypedDict):

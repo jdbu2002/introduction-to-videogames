@@ -12,8 +12,16 @@ from src.ecs.components import (
     CTransform,
     CVelocity,
 )
-from src.ecs.components.tags import CTagEnemy, CTagPlayer
-from src.types import Enemy, Level, Player, PlayerSpawn, Position
+from src.ecs.components.tags import CTagBullet, CTagEnemy, CTagPlayer
+from src.engine.types import PlayerReference
+from src.types import (
+    Bullet,
+    Enemy,
+    Level,
+    Player,
+    PlayerSpawn,
+    Position,
+)
 
 
 def create_square(
@@ -34,10 +42,7 @@ def create_enemy_square(world: World, type: Enemy, position: Position):
     random_angle = math.radians(random.uniform(0, 360))
     random_speed = random.uniform(type["velocity_min"], type["velocity_max"])
 
-    vel = Vector2(
-        random_speed * math.cos(random_angle),
-        random_speed * math.sin(random_angle),
-    )
+    vel = Vector2(math.cos(random_angle), math.sin(random_angle)) * random_speed
 
     entity = create_square(world, size, pos, vel, color)
     world.add_component(entity, CTagEnemy())
@@ -48,10 +53,9 @@ def create_enemy_square(world: World, type: Enemy, position: Position):
 def create_player_square(world: World, cfg: Player, player_spawn: PlayerSpawn):
     size = Vector2(cfg["size"]["x"], cfg["size"]["y"])
 
-    pos_x = player_spawn["position"]["x"] - size.x / 2
-    pos_y = player_spawn["position"]["y"] - size.y / 2
-
-    pos = Vector2(pos_x, pos_y)
+    pos = (
+        Vector2(player_spawn["position"]["x"], player_spawn["position"]["y"]) - size / 2
+    )
     color = Color(cfg["color"]["r"], cfg["color"]["g"], cfg["color"]["b"])
     vel = Vector2(0, 0)
 
@@ -67,7 +71,34 @@ def create_player_input(world: World):
         ("PLAYER_RIGHT", pygame.K_RIGHT),
         ("PLAYER_DOWN", pygame.K_DOWN),
         ("PLAYER_LEFT", pygame.K_LEFT),
+        ("PLAYER_FIRE", pygame.BUTTON_LEFT),
     ]
 
     for input in inputs:
         world.create_entity(CInputCommand(*input))
+
+
+def create_bullet_from_player(
+    world: World, player_ref: PlayerReference, bullet_conf: Bullet, mouse_pos: Vector2
+):
+    player_rect = player_ref["c_s"].surf.get_rect(topleft=player_ref["c_t"].pos)
+
+    size = Vector2(bullet_conf["size"]["x"], bullet_conf["size"]["y"])
+    player_center = Vector2(player_rect.center)
+
+    difference = mouse_pos - player_center
+    if difference.length_squared() == 0:
+        return
+
+    vel = difference.normalize() * bullet_conf["velocity"]
+
+    pos = player_center - size / 2
+
+    color = Color(
+        bullet_conf["color"]["r"], bullet_conf["color"]["g"], bullet_conf["color"]["b"]
+    )
+
+    entity = create_square(world, size, pos, vel, color)
+    world.add_component(entity, CTagBullet())
+
+    return entity

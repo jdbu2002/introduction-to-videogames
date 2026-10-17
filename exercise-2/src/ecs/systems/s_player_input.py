@@ -20,3 +20,11 @@ def system_player_input(
         elif event.type == pygame.KEYUP and c_input.key == event.key:
             c_input.phase = CommandPhase.END
             do_action(c_input)
+
+        elif event.type == pygame.MOUSEBUTTONDOWN and c_input.key == event.button:
+            c_input.phase = CommandPhase.START
+            do_action(c_input)
+
+        elif event.type == pygame.MOUSEBUTTONUP and c_input.key == event.button:
+            c_input.phase = CommandPhase.END
+            do_action(c_input)

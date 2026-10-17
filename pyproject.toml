@@ -10,3 +10,14 @@ dependencies = [
     "pygbag>=0.9.3",
     "pyinstaller>=6.22.3",
 ]
+
+[tool.pyright]
+typeCheckingMode = "strict"
+venvPath = "."
+venv = ".venv"
+executionEnvironments = [
+  { root = "class-1" },
+  { root = "class-2" },
+  { root = "exercise-1" },
+  { root = "exercise-2" },
+]

@@ -1,25 +1,34 @@
 import json
 from os import path
+from typing import cast, get_type_hints
 
 import pygame
 from esper import World
-from pygame import Color
+from pygame import Color, Vector2
+from pygame.time import Clock
 
 from src.create.prefabs import (
+    create_bullet_from_player,
     create_enemy_spawner,
     create_player_input,
     create_player_square,
 )
-from src.ecs.components import CInputCommand, CVelocity
+from src.ecs.components import CInputCommand, CommandPhase
+from src.ecs.components.tags import CTagBullet
 from src.ecs.systems import (
+    system_collission_enemy_bullet,
     system_collission_player_enemy,
+    system_delete_bullet_in_limit,
     system_enemy_spawner,
+    system_limit_player_in_screen,
     system_movement,
     system_player_input,
     system_rendering,
     system_screen_bounce,
 )
-from src.types import Config, Enemy, Level, Player, Window
+from src.types import Bullet, Config, Enemy, Level, Player, Window
+
+from .types import PlayerReference
 
 
 class GameEngine:
@@ -44,7 +53,7 @@ class GameEngine:
 
         self.is_running = False
 
-        self.clock = pygame.time.Clock()
+        self.clock = Clock()
         self.delta_time: float = 0
 
         self.world = World()
@@ -60,12 +69,7 @@ class GameEngine:
         self._clean()
 
     def _create(self):
-        self._player_entity = create_player_square(
-            self.world, self.config["player"], self.config["level"]["player_spawn"]
-        )
-        self._player_c_v = self.world.component_for_entity(
-            self._player_entity, CVelocity
-        )
+        self._load_player_reference()
 
         create_enemy_spawner(self.world, self.config["enemies"], self.config["level"])
 
@@ -85,10 +89,15 @@ class GameEngine:
     def _update(self):
         system_enemy_spawner(self.world, self.delta_time)
         system_movement(self.world, self.delta_time)
+
         system_screen_bounce(self.world, self.screen)
+        system_limit_player_in_screen(self.screen, self._player)
+
         system_collission_player_enemy(
-            self.world, self._player_entity, self.config["level"]["player_spawn"]
+            self.world, self._player["entity"], self.config["level"]["player_spawn"]
         )
+        system_collission_enemy_bullet(self.world)
+        system_delete_bullet_in_limit(self.world, self.screen)
 
         self.world._clear_dead_entities()  # type: ignore
 
@@ -119,36 +128,71 @@ class GameEngine:
         with open(path.join(config_folder, "player.json")) as f:
             player: Player = json.load(f)
 
+        with open(path.join(config_folder, "bullet.json")) as f:
+            bullet: Bullet = json.load(f)
+
         self.config = {
             "window": window,
             "enemies": enemies,
             "level": level,
             "player": player,
+            "bullet": bullet,
         }
 
-    def _do_action(self, c_input: CInputCommand):
-        print(c_input.name, c_input.phase)
+    def _load_player_reference(self):
+        entity = create_player_square(
+            self.world, self.config["player"], self.config["level"]["player_spawn"]
+        )
 
+        components = get_type_hints(PlayerReference)
+        components.pop("entity")
+
+        self._player = cast(
+            PlayerReference,
+            {
+                "entity": entity,
+                **{
+                    name: self.world.component_for_entity(entity, component)
+                    for name, component in components.items()
+                },
+            },
+        )
+
+    def _do_action(self, c_input: CInputCommand):
         match c_input.name:
             case "PLAYER_LEFT":
-                self._player_c_v.vel.x -= (
+                self._player["c_v"].vel.x -= (
                     self.config["player"]["input_velocity"] * c_input.phase.value
                 )
 
             case "PLAYER_RIGHT":
-                self._player_c_v.vel.x += (
+                self._player["c_v"].vel.x += (
                     self.config["player"]["input_velocity"] * c_input.phase.value
                 )
 
             case "PLAYER_UP":
-                self._player_c_v.vel.y -= (
+                self._player["c_v"].vel.y -= (
                     self.config["player"]["input_velocity"] * c_input.phase.value
                 )
 
             case "PLAYER_DOWN":
-                self._player_c_v.vel.y += (
+                self._player["c_v"].vel.y += (
                     self.config["player"]["input_velocity"] * c_input.phase.value
                 )
+
+            case "PLAYER_FIRE":
+                if c_input.phase == CommandPhase.START:
+                    components = self.world.get_component(CTagBullet)
+                    bullet_amount = len(components)
+
+                    if (
+                        bullet_amount
+                        < self.config["level"]["player_spawn"]["max_bullets"]
+                    ):
+                        mouse_pos = Vector2(pygame.mouse.get_pos())
+                        create_bullet_from_player(
+                            self.world, self._player, self.config["bullet"], mouse_pos
+                        )
 
             case _:
                 pass

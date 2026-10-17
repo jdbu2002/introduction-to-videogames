@@ -1,3 +1,4 @@
+from .bullet import Bullet as Bullet
 from .common import Position as Position
 from .config import Config as Config
 from .enemy import Enemy as Enemy
