@@ -58,15 +58,15 @@ def create_sprite(world: World, pos: Vector2, vel: Vector2, surf: Surface):
 
 
 def create_player_square(world: World, cfg: Player, player_spawn: PlayerSpawn):
-    size = Vector2(cfg["size"]["x"], cfg["size"]["y"])
+    surf = load_image(cfg["image"])
+    size = Vector2(surf.size)
 
     pos = (
         Vector2(player_spawn["position"]["x"], player_spawn["position"]["y"]) - size / 2
     )
-    color = Color(cfg["color"]["r"], cfg["color"]["g"], cfg["color"]["b"])
     vel = Vector2(0, 0)
 
-    entity = create_square(world, size, pos, vel, color)
+    entity = create_sprite(world, pos, vel, surf)
     world.add_component(entity, CTagPlayer())
 
     return entity

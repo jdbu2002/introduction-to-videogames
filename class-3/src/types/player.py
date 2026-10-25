@@ -1,9 +1,9 @@
 from typing import TypedDict
 
-from .common import Color, EntitySize
+from .animations import Animations
 
 
 class Player(TypedDict):
-    size: EntitySize
-    color: Color
+    image: str
+    animations: Animations
     input_velocity: float
