@@ -11,7 +11,7 @@ def system_delete_bullet_in_limit(world: World, screen: Surface):
     components = world.get_components(CTransform, CSurface, CTagBullet)
 
     for bullet_entity, (c_t, c_s, _) in components:
-        bullet_rect = c_s.surf.get_rect(topleft=c_t.pos)
+        bullet_rect = CSurface.get_relative_area(c_s.area, c_t.pos)
 
         if (
             bullet_rect.left < 0

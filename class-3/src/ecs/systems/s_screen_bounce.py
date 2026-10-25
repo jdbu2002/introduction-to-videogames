@@ -15,7 +15,7 @@ def system_screen_bounce(world: World, screen: Surface):
         c_t.pos.y = rect.y
 
     for _, (c_t, c_v, c_s, _) in components:
-        rect = c_s.surf.get_rect(topleft=c_t.pos)
+        rect = CSurface.get_relative_area(c_s.area, c_t.pos)
 
         if rect.left < 0 or rect.right > screen_rect.width:
             c_v.vel.x *= -1

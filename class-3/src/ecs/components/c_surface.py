@@ -1,4 +1,4 @@
-from pygame import Color, Surface, Vector2
+from pygame import Color, Rect, Surface, Vector2
 
 
 class CSurface:
@@ -13,3 +13,9 @@ class CSurface:
         c_surf.surf = surf
         c_surf.area = surf.get_rect()
         return c_surf
+
+    @staticmethod
+    def get_relative_area(area: Rect, topleft: Vector2):
+        rect = area.copy()
+        rect.topleft = topleft
+        return rect

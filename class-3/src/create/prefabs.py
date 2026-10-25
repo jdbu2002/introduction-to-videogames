@@ -91,8 +91,9 @@ def create_player_input(world: World):
 def create_bullet_from_player(
     world: World, player_ref: PlayerReference, bullet_conf: Bullet, mouse_pos: Vector2
 ):
-    player_rect = player_ref["c_s"].area.copy()
-    player_rect.topleft = player_ref["c_t"].pos
+    player_rect = CSurface.get_relative_area(
+        player_ref["c_s"].area, player_ref["c_t"].pos
+    )
 
     surf = load_image(bullet_conf["image"])
     size = Vector2(surf.size)

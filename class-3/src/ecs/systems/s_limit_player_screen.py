@@ -1,12 +1,13 @@
 from pygame import Surface
 
+from src.ecs.components import CSurface
 from src.engine.types import PlayerReference
 
 
 def system_limit_player_in_screen(screen: Surface, player_reference: PlayerReference):
     screen_rect = screen.get_rect()
-    player_rect = player_reference["c_s"].surf.get_rect(
-        topleft=player_reference["c_t"].pos
+    player_rect = CSurface.get_relative_area(
+        player_reference["c_s"].area, player_reference["c_t"].pos
     )
 
     if (
