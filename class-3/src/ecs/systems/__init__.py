@@ -1,3 +1,4 @@
+from .s_animation import system_animation as system_animation
 from .s_collission_enemy_bullet import (
     system_collission_enemy_bullet as system_collission_enemy_bullet,
 )

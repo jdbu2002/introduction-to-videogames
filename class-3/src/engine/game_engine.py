@@ -16,6 +16,7 @@ from src.create.prefabs import (
 from src.ecs.components import CInputCommand, CommandPhase
 from src.ecs.components.tags import CTagBullet
 from src.ecs.systems import (
+    system_animation,
     system_collission_enemy_bullet,
     system_collission_player_enemy,
     system_delete_bullet_in_limit,
@@ -98,6 +99,8 @@ class GameEngine:
         )
         system_collission_enemy_bullet(self.world)
         system_delete_bullet_in_limit(self.world, self.screen)
+
+        system_animation(self.world, self.delta_time)
 
         self.world._clear_dead_entities()  # type: ignore
 

@@ -5,6 +5,7 @@ class Animation(TypedDict):
     name: str
     start: int
     end: int
+    framerate: int
 
 
 class Animations(TypedDict):

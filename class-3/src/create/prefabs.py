@@ -6,6 +6,7 @@ from esper import World
 from pygame import Color, Surface, Vector2
 
 from src.ecs.components import (
+    CAnimation,
     CEnemySpawner,
     CInputCommand,
     CSurface,
@@ -60,6 +61,7 @@ def create_sprite(world: World, pos: Vector2, vel: Vector2, surf: Surface):
 def create_player_square(world: World, cfg: Player, player_spawn: PlayerSpawn):
     surf = load_image(cfg["image"])
     size = Vector2(surf.size)
+    size.x /= cfg["animations"]["number_frames"]
 
     pos = (
         Vector2(player_spawn["position"]["x"], player_spawn["position"]["y"]) - size / 2
@@ -68,6 +70,7 @@ def create_player_square(world: World, cfg: Player, player_spawn: PlayerSpawn):
 
     entity = create_sprite(world, pos, vel, surf)
     world.add_component(entity, CTagPlayer())
+    world.add_component(entity, CAnimation(cfg["animations"]))
 
     return entity
 
@@ -88,7 +91,8 @@ def create_player_input(world: World):
 def create_bullet_from_player(
     world: World, player_ref: PlayerReference, bullet_conf: Bullet, mouse_pos: Vector2
 ):
-    player_rect = player_ref["c_s"].surf.get_rect(topleft=player_ref["c_t"].pos)
+    player_rect = player_ref["c_s"].area.copy()
+    player_rect.topleft = player_ref["c_t"].pos
 
     surf = load_image(bullet_conf["image"])
     size = Vector2(surf.size)

@@ -1,3 +1,4 @@
+from .c_animation import CAnimation as CAnimation
 from .c_enemy_spawner import CEnemySpawner as CEnemySpawner
 from .c_input_command import CInputCommand as CInputCommand
 from .c_input_command import CommandPhase as CommandPhase
