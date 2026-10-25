@@ -9,6 +9,7 @@ from src.ecs.components import (
     CAnimation,
     CEnemySpawner,
     CInputCommand,
+    CPlayerState,
     CSurface,
     CTransform,
     CVelocity,
@@ -71,6 +72,7 @@ def create_player_square(world: World, cfg: Player, player_spawn: PlayerSpawn):
     entity = create_sprite(world, pos, vel, surf)
     world.add_component(entity, CTagPlayer())
     world.add_component(entity, CAnimation(cfg["animations"]))
+    world.add_component(entity, CPlayerState())
 
     return entity
 

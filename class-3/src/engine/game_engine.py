@@ -24,6 +24,7 @@ from src.ecs.systems import (
     system_limit_player_in_screen,
     system_movement,
     system_player_input,
+    system_player_state,
     system_rendering,
     system_screen_bounce,
 )
@@ -90,6 +91,8 @@ class GameEngine:
     def _update(self):
         system_enemy_spawner(self.world, self.delta_time)
         system_movement(self.world, self.delta_time)
+
+        system_player_state(self.world)
 
         system_screen_bounce(self.world, self.screen)
         system_limit_player_in_screen(self.screen, self._player)

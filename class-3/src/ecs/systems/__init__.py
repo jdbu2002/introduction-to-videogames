@@ -14,5 +14,6 @@ from .s_limit_player_screen import (
 )
 from .s_movement import system_movement as system_movement
 from .s_player_input import system_player_input as system_player_input
+from .s_player_state import system_player_state as system_player_state
 from .s_rendering import system_rendering as system_rendering
 from .s_screen_bounce import system_screen_bounce as system_screen_bounce
