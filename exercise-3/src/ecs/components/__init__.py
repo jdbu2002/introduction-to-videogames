@@ -1,5 +1,6 @@
 from .c_animation import CAnimation as CAnimation
 from .c_enemy_spawner import CEnemySpawner as CEnemySpawner
+from .c_hunter_state import CHunterState as CHunterState
 from .c_input_command import CInputCommand as CInputCommand
 from .c_input_command import CommandPhase as CommandPhase
 from .c_player_state import CPlayerState as CPlayerState

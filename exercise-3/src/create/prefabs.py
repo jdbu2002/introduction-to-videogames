@@ -8,17 +8,22 @@ from pygame import Color, Surface, Vector2
 from src.ecs.components import (
     CAnimation,
     CEnemySpawner,
+    CHunterState,
     CInputCommand,
     CPlayerState,
     CSurface,
     CTransform,
     CVelocity,
 )
-from src.ecs.components.tags import CTagBullet, CTagEnemy, CTagPlayer
+from src.ecs.components.tags import CTagBullet, CTagEnemy, CTagExplosion, CTagPlayer
 from src.engine.types import PlayerReference
 from src.types import (
+    Animations,
+    Asteroid,
     Bullet,
     Enemy,
+    Explosion,
+    Hunter,
     Level,
     Player,
     PlayerSpawn,
@@ -38,6 +43,13 @@ def create_enemy_spawner(world: World, enemy_cfg: dict[str, Enemy], level_cgf: L
 
 
 def create_enemy_square(world: World, type: Enemy, position: Position):
+    if "velocity_chase" in type:
+        return create_enemy_hunter(world, type, position)
+
+    return create_enemy_asteroid(world, type, position)
+
+
+def create_enemy_asteroid(world: World, type: Asteroid, position: Position):
     pos = Vector2(position["x"], position["y"])
 
     surface = load_image(type["image"])
@@ -53,10 +65,38 @@ def create_enemy_square(world: World, type: Enemy, position: Position):
     return entity
 
 
+def create_enemy_hunter(world: World, type: Hunter, position: Position):
+    pos = Vector2(position["x"], position["y"])
+    vel = Vector2(0, 0)
+
+    surf = load_image(type["image"])
+
+    entity = create_animated_sprite(world, pos, vel, surf, type["animations"])
+    world.add_component(entity, CTagEnemy())
+    world.add_component(entity, CHunterState(pos, type))
+
+    return entity
+
+
 def create_sprite(world: World, pos: Vector2, vel: Vector2, surf: Surface):
     return world.create_entity(
         CTransform(pos), CVelocity(vel), CSurface.from_surface(surf)
     )
+
+
+def create_animated_sprite(
+    world: World, pos: Vector2, vel: Vector2, surf: Surface, animations: Animations
+):
+    entity = create_sprite(world, pos, vel, surf)
+
+    c_a = CAnimation(animations)
+    world.add_component(entity, c_a)
+
+    c_s = world.component_for_entity(entity, CSurface)
+    c_s.area.w = surf.width // c_a.number_frames
+    c_s.area.x = c_s.area.w * c_a.current_frame
+
+    return entity
 
 
 def create_player_square(world: World, cfg: Player, player_spawn: PlayerSpawn):
@@ -69,9 +109,8 @@ def create_player_square(world: World, cfg: Player, player_spawn: PlayerSpawn):
     )
     vel = Vector2(0, 0)
 
-    entity = create_sprite(world, pos, vel, surf)
+    entity = create_animated_sprite(world, pos, vel, surf, cfg["animations"])
     world.add_component(entity, CTagPlayer())
-    world.add_component(entity, CAnimation(cfg["animations"]))
     world.add_component(entity, CPlayerState())
 
     return entity
@@ -111,5 +150,19 @@ def create_bullet_from_player(
 
     entity = create_sprite(world, pos, vel, surf)
     world.add_component(entity, CTagBullet())
+
+    return entity
+
+
+def create_explosion(world: World, center: Vector2, cfg: Explosion):
+    surf = load_image(cfg["image"])
+    size = Vector2(surf.size)
+    size.x /= cfg["animations"]["number_frames"]
+
+    pos = center - size / 2
+    vel = Vector2(0, 0)
+
+    entity = create_animated_sprite(world, pos, vel, surf, cfg["animations"])
+    world.add_component(entity, CTagExplosion())
 
     return entity

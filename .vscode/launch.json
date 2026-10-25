@@ -54,5 +54,15 @@
       "python": "${workspaceFolder}/.venv/bin/python",
       "justMyCode": true
     },
+    {
+      "name": "Exercise 3",
+      "type": "debugpy",
+      "request": "launch",
+      "pythonArgs": ["-B"],
+      "program": "${workspaceFolder}/exercise-3/main.py",
+      "console": "integratedTerminal",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "justMyCode": true
+    },
   ]
 }

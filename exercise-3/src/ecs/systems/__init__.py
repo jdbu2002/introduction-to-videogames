@@ -9,6 +9,8 @@ from .s_delete_bullet_limit import (
     system_delete_bullet_in_limit as system_delete_bullet_in_limit,
 )
 from .s_enemy_spawner import system_enemy_spawner as system_enemy_spawner
+from .s_explosion_kill import system_explosion_kill as system_explosion_kill
+from .s_hunter_state import system_hunter_state as system_hunter_state
 from .s_limit_player_screen import (
     system_limit_player_in_screen as system_limit_player_in_screen,
 )

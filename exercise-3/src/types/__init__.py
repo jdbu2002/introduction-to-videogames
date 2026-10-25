@@ -2,7 +2,10 @@ from .animations import Animations as Animations
 from .bullet import Bullet as Bullet
 from .common import Position as Position
 from .config import Config as Config
+from .enemy import Asteroid as Asteroid
 from .enemy import Enemy as Enemy
+from .enemy import Hunter as Hunter
+from .explosion import Explosion as Explosion
 from .level import Level as Level
 from .level import PlayerSpawn as PlayerSpawn
 from .player import Player as Player

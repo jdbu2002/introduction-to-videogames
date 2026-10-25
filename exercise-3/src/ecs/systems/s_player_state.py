@@ -17,23 +17,14 @@ def system_player_state(world: World):
 
 
 def _do_idle_state(c_v: CVelocity, c_a: CAnimation, c_ps: CPlayerState):
-    _set_animation(c_a, 1)
+    c_a.set_animation("IDLE")
 
     if c_v.vel.magnitude_squared() > 0:
         c_ps.state = PlayerState.MOVE
 
 
 def _do_move_state(c_v: CVelocity, c_a: CAnimation, c_ps: CPlayerState):
-    _set_animation(c_a, 0)
+    c_a.set_animation("MOVE")
 
     if c_v.vel.magnitude_squared() <= 0:
         c_ps.state = PlayerState.IDLE
-
-
-def _set_animation(c_a: CAnimation, index: int):
-    if c_a.current_animation == index:
-        return
-
-    c_a.current_animation = index
-    c_a.current_animation_time = 0
-    c_a.current_frame = c_a.animations_list[index].start

@@ -17,7 +17,8 @@ def system_animation(world: World, delta_time: float):
 
             if c_a.current_frame > animation.end:
                 c_a.current_frame = animation.start
+                c_a.finished = True
 
-            rect_surf = c_s.surf.get_rect()
-            c_s.area.w = rect_surf.w / c_a.number_frames
-            c_s.area.x = c_s.area.w * c_a.current_frame
+        rect_surf = c_s.surf.get_rect()
+        c_s.area.w = rect_surf.w // c_a.number_frames
+        c_s.area.x = c_s.area.w * c_a.current_frame

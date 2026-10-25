@@ -21,6 +21,8 @@ from src.ecs.systems import (
     system_collission_player_enemy,
     system_delete_bullet_in_limit,
     system_enemy_spawner,
+    system_explosion_kill,
+    system_hunter_state,
     system_limit_player_in_screen,
     system_movement,
     system_player_input,
@@ -28,7 +30,7 @@ from src.ecs.systems import (
     system_rendering,
     system_screen_bounce,
 )
-from src.types import Bullet, Config, Enemy, Level, Player, Window
+from src.types import Bullet, Config, Enemy, Explosion, Level, Player, Window
 
 from .types import PlayerReference
 
@@ -93,17 +95,22 @@ class GameEngine:
         system_movement(self.world, self.delta_time)
 
         system_player_state(self.world)
+        system_hunter_state(self.world, self._player, self.delta_time)
 
         system_screen_bounce(self.world, self.screen)
         system_limit_player_in_screen(self.screen, self._player)
 
         system_collission_player_enemy(
-            self.world, self._player["entity"], self.config["level"]["player_spawn"]
+            self.world,
+            self._player["entity"],
+            self.config["level"]["player_spawn"],
+            self.config["explosion"],
         )
-        system_collission_enemy_bullet(self.world)
+        system_collission_enemy_bullet(self.world, self.config["explosion"])
         system_delete_bullet_in_limit(self.world, self.screen)
 
         system_animation(self.world, self.delta_time)
+        system_explosion_kill(self.world)
 
         self.world._clear_dead_entities()  # type: ignore
 
@@ -137,12 +144,16 @@ class GameEngine:
         with open(path.join(config_folder, "bullet.json")) as f:
             bullet: Bullet = json.load(f)
 
+        with open(path.join(config_folder, "explosion.json")) as f:
+            explosion: Explosion = json.load(f)
+
         self.config = {
             "window": window,
             "enemies": enemies,
             "level": level,
             "player": player,
             "bullet": bullet,
+            "explosion": explosion,
         }
 
     def _load_player_reference(self):

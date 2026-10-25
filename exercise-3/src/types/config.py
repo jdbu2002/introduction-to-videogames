@@ -2,6 +2,7 @@ from typing import TypedDict
 
 from .bullet import Bullet
 from .enemy import Enemy
+from .explosion import Explosion
 from .level import Level
 from .player import Player
 from .window import Window
@@ -13,3 +14,4 @@ class Config(TypedDict):
     level: Level
     player: Player
     bullet: Bullet
+    explosion: Explosion

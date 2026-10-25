@@ -20,4 +20,5 @@ executionEnvironments = [
   { root = "class-2" },
   { root = "exercise-1" },
   { root = "exercise-2" },
+  { root = "exercise-3" },
 ]
