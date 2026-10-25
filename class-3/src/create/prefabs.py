@@ -3,7 +3,7 @@ import random
 
 import pygame
 from esper import World
-from pygame import Color, Vector2
+from pygame import Color, Surface, Vector2
 
 from src.ecs.components import (
     CEnemySpawner,
@@ -22,6 +22,7 @@ from src.types import (
     PlayerSpawn,
     Position,
 )
+from src.utils.load_image import load_image
 
 
 def create_square(
@@ -36,18 +37,24 @@ def create_enemy_spawner(world: World, enemy_cfg: dict[str, Enemy], level_cgf: L
 
 def create_enemy_square(world: World, type: Enemy, position: Position):
     pos = Vector2(position["x"], position["y"])
-    color = Color(type["color"]["r"], type["color"]["g"], type["color"]["b"])
-    size = Vector2(type["size"]["x"], type["size"]["y"])
+
+    surface = load_image(type["image"])
 
     random_angle = math.radians(random.uniform(0, 360))
     random_speed = random.uniform(type["velocity_min"], type["velocity_max"])
 
     vel = Vector2(math.cos(random_angle), math.sin(random_angle)) * random_speed
 
-    entity = create_square(world, size, pos, vel, color)
+    entity = create_sprite(world, pos, vel, surface)
     world.add_component(entity, CTagEnemy())
 
     return entity
+
+
+def create_sprite(world: World, pos: Vector2, vel: Vector2, surf: Surface):
+    return world.create_entity(
+        CTransform(pos), CVelocity(vel), CSurface.from_surface(surf)
+    )
 
 
 def create_player_square(world: World, cfg: Player, player_spawn: PlayerSpawn):
@@ -83,7 +90,8 @@ def create_bullet_from_player(
 ):
     player_rect = player_ref["c_s"].surf.get_rect(topleft=player_ref["c_t"].pos)
 
-    size = Vector2(bullet_conf["size"]["x"], bullet_conf["size"]["y"])
+    surf = load_image(bullet_conf["image"])
+    size = Vector2(surf.size)
     player_center = Vector2(player_rect.center)
 
     difference = mouse_pos - player_center
@@ -94,11 +102,7 @@ def create_bullet_from_player(
 
     pos = player_center - size / 2
 
-    color = Color(
-        bullet_conf["color"]["r"], bullet_conf["color"]["g"], bullet_conf["color"]["b"]
-    )
-
-    entity = create_square(world, size, pos, vel, color)
+    entity = create_sprite(world, pos, vel, surf)
     world.add_component(entity, CTagBullet())
 
     return entity
