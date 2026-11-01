@@ -1,5 +1,4 @@
 import json
-from os import path
 from typing import cast, get_type_hints
 
 import pygame
@@ -30,7 +29,8 @@ from src.ecs.systems import (
     system_rendering,
     system_screen_bounce,
 )
-from src.types import Bullet, Config, Enemy, Explosion, Level, Player, Window
+from src.types import Bullet, Config, Enemy, Explosion, Hunter, Level, Player, Window
+from src.utils.parse_path import parse_path
 
 from .types import PlayerReference
 
@@ -95,7 +95,12 @@ class GameEngine:
         system_movement(self.world, self.delta_time)
 
         system_player_state(self.world)
-        system_hunter_state(self.world, self._player, self.delta_time)
+        system_hunter_state(
+            self.world,
+            self._player,
+            self.delta_time,
+            cast(Hunter, self.config["enemies"]["Hunter"]),
+        )
 
         system_screen_bounce(self.world, self.screen)
         system_limit_player_in_screen(self.screen, self._player)
@@ -126,25 +131,22 @@ class GameEngine:
         pygame.quit()
 
     def _load_config_files(self):
-        file_path = path.dirname(path.abspath(__file__))
-        config_folder = path.join(file_path, "../../assets/cfg")
-
-        with open(path.join(config_folder, "window.json")) as f:
+        with open(parse_path("assets/cfg/window.json")) as f:
             window: Window = json.load(f)
 
-        with open(path.join(config_folder, "enemies.json")) as f:
+        with open(parse_path("assets/cfg/enemies.json")) as f:
             enemies: dict[str, Enemy] = json.load(f)
 
-        with open(path.join(config_folder, "level_01.json")) as f:
+        with open(parse_path("assets/cfg/level_01.json")) as f:
             level: Level = json.load(f)
 
-        with open(path.join(config_folder, "player.json")) as f:
+        with open(parse_path("assets/cfg/player.json")) as f:
             player: Player = json.load(f)
 
-        with open(path.join(config_folder, "bullet.json")) as f:
+        with open(parse_path("assets/cfg/bullet.json")) as f:
             bullet: Bullet = json.load(f)
 
-        with open(path.join(config_folder, "explosion.json")) as f:
+        with open(parse_path("assets/cfg/explosion.json")) as f:
             explosion: Explosion = json.load(f)
 
         self.config = {

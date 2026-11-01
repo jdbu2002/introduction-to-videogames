@@ -3,11 +3,16 @@ from pygame import Vector2
 
 from src.ecs.components import CAnimation, CHunterState, CSurface, CTransform, CVelocity
 from src.ecs.components.c_hunter_state import HunterState
+from src.engine.service_locator import ServiceLocator
 from src.engine.types import PlayerReference
+from src.types import Hunter
 
 
 def system_hunter_state(
-    world: World, player_reference: PlayerReference, delta_time: float
+    world: World,
+    player_reference: PlayerReference,
+    delta_time: float,
+    hunter_cfg: Hunter,
 ):
     components = world.get_components(CTransform, CVelocity, CAnimation, CHunterState)
 
@@ -22,7 +27,7 @@ def system_hunter_state(
 
         match c_hs.state:
             case HunterState.IDLE:
-                _do_idle_state(c_v, c_a, c_hs, hunter_center, player_center)
+                _do_idle_state(c_v, c_a, c_hs, hunter_center, player_center, hunter_cfg)
 
             case HunterState.CHASE:
                 _do_chase_state(c_t, c_v, c_a, c_hs, hunter_center, player_center)
@@ -37,11 +42,13 @@ def _do_idle_state(
     c_hs: CHunterState,
     hunter_center: Vector2,
     player_center: Vector2,
+    hunter_cfg: Hunter,
 ):
     c_a.set_animation("IDLE")
     c_v.vel = Vector2(0, 0)
 
     if hunter_center.distance_to(player_center) <= c_hs.distance_start_chase:
+        ServiceLocator.sounds_service.play(hunter_cfg["sound_chase"])
         c_hs.state = HunterState.CHASE
 
 

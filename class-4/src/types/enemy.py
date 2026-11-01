@@ -5,12 +5,14 @@ from .animations import Animations
 
 class Asteroid(TypedDict):
     image: str
+    sound: str
     velocity_min: float
     velocity_max: float
 
 
 class Hunter(TypedDict):
     image: str
+    sound_chase: str
     animations: Animations
     velocity_chase: float
     velocity_return: float

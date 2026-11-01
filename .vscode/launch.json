@@ -64,5 +64,15 @@
       "python": "${workspaceFolder}/.venv/bin/python",
       "justMyCode": true
     },
+    {
+      "name": "Class 4",
+      "type": "debugpy",
+      "request": "launch",
+      "pythonArgs": ["-B"],
+      "program": "${workspaceFolder}/class-4/main.py",
+      "console": "integratedTerminal",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "justMyCode": true
+    },
   ]
 }

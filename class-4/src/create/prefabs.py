@@ -16,6 +16,7 @@ from src.ecs.components import (
     CVelocity,
 )
 from src.ecs.components.tags import CTagBullet, CTagEnemy, CTagExplosion, CTagPlayer
+from src.engine.service_locator import ServiceLocator
 from src.engine.types import PlayerReference
 from src.types import (
     Animations,
@@ -29,7 +30,6 @@ from src.types import (
     PlayerSpawn,
     Position,
 )
-from src.utils.load_image import load_image
 
 
 def create_square(
@@ -52,7 +52,7 @@ def create_enemy_square(world: World, type: Enemy, position: Position):
 def create_enemy_asteroid(world: World, type: Asteroid, position: Position):
     pos = Vector2(position["x"], position["y"])
 
-    surface = load_image(type["image"])
+    surface = ServiceLocator.images_service.get(type["image"])
 
     random_angle = math.radians(random.uniform(0, 360))
     random_speed = random.uniform(type["velocity_min"], type["velocity_max"])
@@ -62,6 +62,8 @@ def create_enemy_asteroid(world: World, type: Asteroid, position: Position):
     entity = create_sprite(world, pos, vel, surface)
     world.add_component(entity, CTagEnemy())
 
+    ServiceLocator.sounds_service.play(type["sound"])
+
     return entity
 
 
@@ -69,7 +71,7 @@ def create_enemy_hunter(world: World, type: Hunter, position: Position):
     pos = Vector2(position["x"], position["y"])
     vel = Vector2(0, 0)
 
-    surf = load_image(type["image"])
+    surf = ServiceLocator.images_service.get(type["image"])
 
     entity = create_animated_sprite(world, pos, vel, surf, type["animations"])
     world.add_component(entity, CTagEnemy())
@@ -100,7 +102,7 @@ def create_animated_sprite(
 
 
 def create_player_square(world: World, cfg: Player, player_spawn: PlayerSpawn):
-    surf = load_image(cfg["image"])
+    surf = ServiceLocator.images_service.get(cfg["image"])
     size = Vector2(surf.size)
     size.x /= cfg["animations"]["number_frames"]
 
@@ -136,7 +138,7 @@ def create_bullet_from_player(
         player_ref["c_s"].area, player_ref["c_t"].pos
     )
 
-    surf = load_image(bullet_conf["image"])
+    surf = ServiceLocator.images_service.get(bullet_conf["image"])
     size = Vector2(surf.size)
     player_center = Vector2(player_rect.center)
 
@@ -151,11 +153,13 @@ def create_bullet_from_player(
     entity = create_sprite(world, pos, vel, surf)
     world.add_component(entity, CTagBullet())
 
+    ServiceLocator.sounds_service.play(bullet_conf["sound"])
+
     return entity
 
 
 def create_explosion(world: World, center: Vector2, cfg: Explosion):
-    surf = load_image(cfg["image"])
+    surf = ServiceLocator.images_service.get(cfg["image"])
     size = Vector2(surf.size)
     size.x /= cfg["animations"]["number_frames"]
 
@@ -164,5 +168,7 @@ def create_explosion(world: World, center: Vector2, cfg: Explosion):
 
     entity = create_animated_sprite(world, pos, vel, surf, cfg["animations"])
     world.add_component(entity, CTagExplosion())
+
+    ServiceLocator.sounds_service.play(cfg["sound"])
 
     return entity
