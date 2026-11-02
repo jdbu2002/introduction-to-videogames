@@ -15,3 +15,7 @@ class Color(TypedDict):
     r: int
     g: int
     b: int
+
+
+class ColorAlpha(Color):
+    a: int

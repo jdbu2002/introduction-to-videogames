@@ -6,7 +6,10 @@ from .enemy import Asteroid as Asteroid
 from .enemy import Enemy as Enemy
 from .enemy import Hunter as Hunter
 from .explosion import Explosion as Explosion
+from .interface import Interface as Interface
+from .interface import Text as Text
 from .level import Level as Level
 from .level import PlayerSpawn as PlayerSpawn
 from .player import Player as Player
+from .special import Special as Special
 from .window import Window as Window

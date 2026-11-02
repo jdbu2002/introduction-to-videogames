@@ -1,0 +1,63 @@
+{
+    "title": {
+        "font": "assets/fnt/PressStart2P.ttf",
+        "size": 16,
+        "color": { "r": 240, "g": 240, "b": 255 },
+        "text": "ONDA ESTELAR",
+        "position": { "x": 12, "y": 12 },
+        "anchor": "topleft"
+    },
+    "instructions": {
+        "font": "assets/fnt/PressStart2P.ttf",
+        "size": 8,
+        "color": { "r": 255, "g": 220, "b": 60 },
+        "text": "Flechas: Moverse  Clic: Disparar  Espacio/Clic der.: Onda  P: Pausa",
+        "position": { "x": 12, "y": 34 },
+        "anchor": "topleft"
+    },
+    "paused": {
+        "font": "assets/fnt/PressStart2P.ttf",
+        "size": 24,
+        "color": { "r": 255, "g": 255, "b": 255 },
+        "text": "PAUSA",
+        "position": { "x": 320, "y": 170 },
+        "anchor": "center"
+    },
+    "paused_hint": {
+        "font": "assets/fnt/PressStart2P.ttf",
+        "size": 8,
+        "color": { "r": 180, "g": 180, "b": 200 },
+        "text": "Presiona P para continuar",
+        "position": { "x": 320, "y": 200 },
+        "anchor": "center"
+    },
+    "pause_overlay": { "r": 0, "g": 0, "b": 10, "a": 160 },
+    "special": {
+        "label": {
+            "font": "assets/fnt/PressStart2P.ttf",
+            "size": 8,
+            "color": { "r": 240, "g": 240, "b": 255 },
+            "text": "ONDA",
+            "position": { "x": 12, "y": 326 },
+            "anchor": "topleft"
+        },
+        "status": {
+            "font": "assets/fnt/PressStart2P.ttf",
+            "size": 8,
+            "color": { "r": 150, "g": 150, "b": 170 },
+            "text": "{:.1f}s",
+            "text_ready": "LISTA!",
+            "color_ready": { "r": 80, "g": 255, "b": 230 },
+            "position": { "x": 52, "y": 326 },
+            "anchor": "topleft"
+        },
+        "bar": {
+            "position": { "x": 12, "y": 338 },
+            "size": { "w": 120, "h": 8 },
+            "color_bg": { "r": 50, "g": 50, "b": 70 },
+            "color_fill": { "r": 60, "g": 140, "b": 200 },
+            "color_ready": { "r": 80, "g": 255, "b": 230 },
+            "color_denied": { "r": 230, "g": 50, "b": 60 }
+        }
+    }
+}

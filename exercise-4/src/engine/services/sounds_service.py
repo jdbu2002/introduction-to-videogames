@@ -1,3 +1,4 @@
+import pygame
 from pygame.mixer import Sound
 
 from src.utils.parse_path import parse_path
@@ -14,3 +15,9 @@ class SoundsService:
             self._sounds[path].play()
         except FileNotFoundError:
             print("Sound not found. Skipping!")
+
+    def pause_all(self):
+        pygame.mixer.pause()
+
+    def resume_all(self):
+        pygame.mixer.unpause()

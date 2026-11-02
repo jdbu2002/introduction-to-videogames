@@ -15,6 +15,7 @@ dependencies = [
 typeCheckingMode = "strict"
 venvPath = "."
 venv = ".venv"
+exclude = ["**/.venv", "**/__pycache__", "**/build", "exercise-4/esper"]
 executionEnvironments = [
   { root = "class-1" },
   { root = "class-2" },
@@ -23,4 +24,5 @@ executionEnvironments = [
   { root = "exercise-1" },
   { root = "exercise-2" },
   { root = "exercise-3" },
+  { root = "exercise-4" },
 ]

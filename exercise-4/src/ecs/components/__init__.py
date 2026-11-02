@@ -1,9 +1,13 @@
 from .c_animation import CAnimation as CAnimation
+from .c_camera_shake import CCameraShake as CCameraShake
 from .c_enemy_spawner import CEnemySpawner as CEnemySpawner
 from .c_hunter_state import CHunterState as CHunterState
 from .c_input_command import CInputCommand as CInputCommand
 from .c_input_command import CommandPhase as CommandPhase
 from .c_player_state import CPlayerState as CPlayerState
+from .c_shockwave import CShockwave as CShockwave
+from .c_special import CSpecial as CSpecial
 from .c_surface import CSurface as CSurface
+from .c_text import CText as CText
 from .c_transform import CTransform as CTransform
 from .c_velocity import CVelocity as CVelocity

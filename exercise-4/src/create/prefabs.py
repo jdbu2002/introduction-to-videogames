@@ -7,15 +7,27 @@ from pygame import Color, Surface, Vector2
 
 from src.ecs.components import (
     CAnimation,
+    CCameraShake,
     CEnemySpawner,
     CHunterState,
     CInputCommand,
     CPlayerState,
+    CShockwave,
+    CSpecial,
     CSurface,
+    CText,
     CTransform,
     CVelocity,
 )
-from src.ecs.components.tags import CTagBullet, CTagEnemy, CTagExplosion, CTagPlayer
+from src.ecs.components.tags import (
+    CTagBullet,
+    CTagEnemy,
+    CTagExplosion,
+    CTagPlayer,
+    CTagSpecialBar,
+    CTagSpecialText,
+    CTagUI,
+)
 from src.engine.service_locator import ServiceLocator
 from src.engine.types import PlayerReference
 from src.types import (
@@ -25,11 +37,16 @@ from src.types import (
     Enemy,
     Explosion,
     Hunter,
+    Interface,
     Level,
     Player,
     PlayerSpawn,
     Position,
+    Special,
+    Text,
 )
+from src.types.common import Color as ColorCfg
+from src.types.common import ColorAlpha
 
 
 def create_square(
@@ -125,6 +142,9 @@ def create_player_input(world: World):
         ("PLAYER_DOWN", pygame.K_DOWN),
         ("PLAYER_LEFT", pygame.K_LEFT),
         ("PLAYER_FIRE", pygame.BUTTON_LEFT),
+        ("PLAYER_SPECIAL", pygame.K_SPACE),
+        ("PLAYER_SPECIAL", pygame.BUTTON_RIGHT),
+        ("PAUSE", pygame.K_p),
     ]
 
     for input in inputs:
@@ -172,3 +192,81 @@ def create_explosion(world: World, center: Vector2, cfg: Explosion):
     ServiceLocator.sounds_service.play(cfg["sound"])
 
     return entity
+
+
+def to_color(cfg: ColorCfg | ColorAlpha):
+    return Color(cfg["r"], cfg["g"], cfg["b"], cfg.get("a", 255))
+
+
+def create_text(world: World, cfg: Text, text: str | None = None):
+    font = ServiceLocator.fonts_service.get(cfg["font"], cfg["size"])
+    color = to_color(cfg["color"])
+    position = Vector2(cfg["position"]["x"], cfg["position"]["y"])
+
+    c_s = CSurface.from_text(cfg["text"] if text is None else text, font, color)
+    c_txt = CText(font, color, cfg["anchor"], position)
+
+    return world.create_entity(
+        CTransform(c_txt.get_anchored_pos(c_s.area)), c_s, c_txt, CTagUI()
+    )
+
+
+def create_interface(world: World, cfg: Interface):
+    create_text(world, cfg["title"])
+    create_text(world, cfg["instructions"])
+
+
+def create_pause_screen(world: World, cfg: Interface, screen_size: Vector2):
+    overlay = Surface(screen_size, pygame.SRCALPHA)
+    overlay.fill(to_color(cfg["pause_overlay"]))
+
+    return [
+        world.create_entity(
+            CTransform(Vector2(0, 0)), CSurface.from_surface(overlay), CTagUI()
+        ),
+        create_text(world, cfg["paused"]),
+        create_text(world, cfg["paused_hint"]),
+    ]
+
+
+def create_special(world: World, special_cfg: Special, interface_cfg: Interface):
+    hud = interface_cfg["special"]
+    bar = hud["bar"]
+
+    create_text(world, hud["label"])
+
+    status = create_text(world, hud["status"], hud["status"]["text_ready"])
+    world.add_component(status, CTagSpecialText())
+
+    bar_pos = Vector2(bar["position"]["x"], bar["position"]["y"])
+    bar_size = Vector2(bar["size"]["w"], bar["size"]["h"])
+    world.create_entity(
+        CTransform(bar_pos),
+        CSurface(bar_size, to_color(bar["color_bg"])),
+        CTagUI(),
+        CTagSpecialBar(),
+    )
+
+    return world.create_entity(CSpecial(special_cfg["cooldown"]))
+
+
+def create_shockwave(world: World, center: Vector2, cfg: Special):
+    entity = world.create_entity(
+        CTransform(center.copy()),
+        CSurface(Vector2(0, 0), Color(0, 0, 0)),
+        CShockwave(
+            center,
+            cfg["max_radius"],
+            cfg["duration"],
+            cfg["thickness"],
+            to_color(cfg["color"]),
+        ),
+    )
+
+    ServiceLocator.sounds_service.play(cfg["sound"])
+
+    return entity
+
+
+def create_camera(world: World):
+    return world.create_entity(CCameraShake())
