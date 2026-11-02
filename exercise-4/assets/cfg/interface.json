@@ -37,7 +37,7 @@
             "font": "assets/fnt/PressStart2P.ttf",
             "size": 8,
             "color": { "r": 240, "g": 240, "b": 255 },
-            "text": "ONDA",
+            "text": "ONDA: ",
             "position": { "x": 12, "y": 326 },
             "anchor": "topleft"
         },
@@ -46,7 +46,7 @@
             "size": 8,
             "color": { "r": 150, "g": 150, "b": 170 },
             "text": "{:.1f}s",
-            "text_ready": "LISTA!",
+            "text_ready": "¡LISTA!",
             "color_ready": { "r": 80, "g": 255, "b": 230 },
             "position": { "x": 52, "y": 326 },
             "anchor": "topleft"
